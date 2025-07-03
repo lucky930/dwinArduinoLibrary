@@ -1,4 +1,4 @@
- //CODE WORKING WITH UNO WITH HW SERIAL
+ //CODE WORKING WITH Arduino UNO WITH HW SERIAL
 #define CMD_HEAD1 0x5A
 #define CMD_HEAD2 0xA5
 #define CMD_WRITE 0x82
@@ -6,10 +6,10 @@
 #define CMD_PAGESWITCH 0x84
 
 //Functions list:
-//DWIN
 void writeToVP(uint16_t vpAddress, uint16_t value);
 uint16_t readVP(uint16_t vpAddress);
 void switchToPage(byte pageNumber);
+void writeTextToVP(uint16_t vpAddress, const char* text);
 
 uint16_t currentPage = 0xFFFF;  // Unknown at start
 uint16_t lastPage = 0xFFFF;     // For detecting changes
@@ -22,7 +22,6 @@ void setup()
   Serial.begin(9600);  
   delay(1000);  // Display initialization
       switchToPage(1);
-
 }
 
 void loop() {
@@ -30,23 +29,8 @@ void loop() {
     lastPageCheckTime = millis();
     writeToVP(0x5000, 100);
     Serial.println("Ping...");
-      unsigned long elapsed = millis() - therapyStartTime; 
-      formatElapsedTime(elapsed); // Directly print formatted time
     }
   }
-
-void formatElapsedTime(unsigned long milliseconds) {
-  unsigned long seconds = milliseconds / 1000;
-  unsigned long minutes = seconds / 60;
-  unsigned long hours = minutes / 60;
-  seconds %= 60;
-  minutes %= 60;
-
-  char buffer[11]; // 10 chars + null terminator
-  sprintf(buffer, "%03lu:%02lu:%02lu ", hours, minutes, seconds);
-  // Now send to DWIN text box at VP 0x5030
-  writeTextToVP(0x5030, buffer);
-}
 
 // Function to write a 16-bit value to a given VP address
 void writeToVP(uint16_t vpAddress, uint16_t value) {
@@ -121,16 +105,3 @@ void writeTextToVP(uint16_t vpAddress, const char* text) {
     Serial.write(text[i]);
   }
 }
-
-/*
-void setup() {
-  Serial.begin(115200);
-  delay(1000);
-  Serial.println("Serial test start...");
-}
-
-void loop() {
-  Serial.println("Ping...");
-  delay(1000);
-}
-*/
